@@ -42,6 +42,11 @@ const EditProfile = () => {
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
   const [admissionYear, setAdmissionYear] = useState(null);
+
+  const [passwordState, setPasswordState] = useState({
+    password: "",
+    confirmPassword: "",
+  });
   const [errors, setErrors] = useState({
     password: "",
     confirmPassword: "",
@@ -91,15 +96,14 @@ const EditProfile = () => {
       const userInfoData = response.data.data.userInfo
       if (data) {
         const datePickerBatch = convertBatchToDate(userInfoData.batch);
-        setFormData({ ...data, password: '', confirmPassword: '' });
+        setFormData({ ...data });
         setuserInfo({ ...userInfoData, batch: datePickerBatch });
+
         setAdmissionYear(datePickerBatch);
-        // Store fetched data in state
-        setFetchError(false); // Reset fetch error state
+        setFetchError(false); 
         setLoading(false);
       } else {
         setFetchError(true);
-        // Set fetch error state if no data found
         setLoading(false);
       }
     } catch (error) {
@@ -113,8 +117,10 @@ const EditProfile = () => {
   };
   const hanldeChangePassword = async () => {
     try {
-      const passwordError = validateField('password', formData.password);
-      const confirmPasswordError = validateField('confirmPassword', formData.confirmPassword, formData);
+      console.log(passwordState)
+      const passwordError = validateField('password', passwordState.password
+      );
+      const confirmPasswordError = validateField('confirmPassword', passwordState.confirmPassword, passwordState);
 
       if (passwordError || confirmPasswordError) {
         // Check if either password or confirm password has an error
@@ -134,7 +140,7 @@ const EditProfile = () => {
         headers: { "Content-Type": "application/json", "auth-token": token },
         body: JSON.stringify({
           crn: crn,
-          password: formData.password,
+          password: passwordState.password,
         }),
       });
 
@@ -144,6 +150,10 @@ const EditProfile = () => {
         toast.success("Succesfully Changed Password");
         setFormData({});
         setErrors({
+          password: "",
+          confirmPassword: "",
+        });
+        setPasswordState({
           password: "",
           confirmPassword: "",
         });
@@ -167,20 +177,20 @@ const EditProfile = () => {
   const handleSubmit = async () => {
     try {
       // Validate form data
+      console.log(formData)
       const formDataErrors = Object.keys(formData).reduce((acc, key) => {
         const error = validateField(key, formData[key]);
         return error ? { ...acc, [key]: error } : acc;
       }, {});
-
+    console.log(userInfo)
       // Validate userInfo
       const userInfoErrors = Object.keys(userInfo).reduce((acc, key) => {
         const error = validateField(key, userInfo[key]);
         return error ? { ...acc, [key]: error } : acc;
       }, {});
-
       // Combine both sets of errors
       const allErrors = { ...formDataErrors, ...userInfoErrors };
-
+      // console.log(allErrors)
       // Check if there are any validation errors
       if (Object.keys(allErrors).length > 0) {
         let showError = true; // Flag to track if an error has been shown
@@ -286,6 +296,18 @@ const EditProfile = () => {
     setErrors((prevErrors) => ({
       ...prevErrors,
       [name]: validateField(name, value, formData),
+    }));
+  };
+  const handleChangePasswordData = (e) => {
+    const { name, value } = e.target;
+    setIsChanged(true);
+    setPasswordState((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: validateField(name, value, passwordState),
     }));
   };
   const handleBatchChange = (newDate) => {
@@ -777,9 +799,9 @@ const EditProfile = () => {
                   fullWidth
                   name="password"
                   label="Set New Password"
-                  value={formData.password}
+                  value={passwordState.password}
                   type={showPassword ? "text" : "password"} // Show password text if showPassword is true
-                  onChange={handleChangeformData}
+                  onChange={handleChangePasswordData}
                   disabled={!isEditing}
                   InputLabelProps={{ shrink: true }}
                   helperText={errors.password}
@@ -809,9 +831,9 @@ const EditProfile = () => {
                   fullWidth
                   name="confirmPassword"
                   label="Confirm Password"
-                  value={formData.confirmPassword}
+                  value={passwordState.confirmPassword}
                   type="password"
-                  onChange={handleChangeformData}
+                  onChange={handleChangePasswordData}
                   InputLabelProps={{ shrink: true }}
                   disabled={!isEditing}
                   error={Boolean(errors.confirmPassword)}
