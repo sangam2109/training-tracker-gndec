@@ -2,7 +2,11 @@ import React from 'react';
 import { Button, Box } from '@mui/material';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { base64toBlob } from '../utils/base64topdf'
+const API_URL =
+    import.meta.env.VITE_ENV === "production"
+        ? import.meta.env.VITE_PROD_BASE_URL
+        : import.meta.env.VITE_DEV_BASE_URL;
+
 const ExportCsvComponent = ({ data, selectedTraining }) => {
     const csvConfig = mkConfig({
         fieldSeparator: ',',
@@ -34,9 +38,10 @@ const ExportCsvComponent = ({ data, selectedTraining }) => {
                     filteredRow['Project Name'] = trainingData.projectName;
                     filteredRow['Technology Used'] = trainingData.technology.join(', ');
                     if (trainingData.certificate) {
-                        const certifiateBlob = base64toBlob(trainingData.certificate);
-                        const certificateUrl = URL.createObjectURL(certifiateBlob);
-                        filteredRow['Training Certificate'] = certificateUrl;
+                        const certifiateUrl = `${API_URL}certificate/${selectedTraining}/${row._id}`;
+                        
+                        filteredRow['Training Certificate'] = certifiateUrl;
+                    
                     } else {
                         filteredRow['Training Certificate'] = '';
                     }
@@ -56,8 +61,8 @@ const ExportCsvComponent = ({ data, selectedTraining }) => {
 
                     // Convert appointment letter to data URL
                     if (trainingData.appointmentLetter) {
-                        const appointmentLetterBlob = base64toBlob(trainingData.appointmentLetter);
-                        filteredRow['Appointment Letter'] = URL.createObjectURL(appointmentLetterBlob);
+                        const certificateURL = `${API_URL}certificate/appointmentLetter/${row._id}`;
+                        filteredRow['Appointment Letter'] = certificateURL;
 
                     } else {
                         filteredRow['Appointment Letter'] = '';
@@ -66,8 +71,8 @@ const ExportCsvComponent = ({ data, selectedTraining }) => {
                     filteredRow['Higher Study Place'] = trainingData.highStudyplace;
                     filteredRow['Gate Appeared Status'] = trainingData.gateStatus;
                     if (trainingData.gateCertificate) {
-                        const gateCertificateBlob = base64toBlob(trainingData.gateCertificate);
-                        filteredRow['Gate Admit Card/ ScoreCard'] = URL.createObjectURL(gateCertificateBlob);
+                        const certificateURL = `${API_URL}certificate/gateCertificate/${row._id}`; // Replace with actual URL
+                        filteredRow['Gate Admit Card/ ScoreCard'] = certificateURL
 
                     } else {
                         filteredRow['Gate Admit Card/ ScoreCard'] = '';

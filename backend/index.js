@@ -27,6 +27,7 @@ const tr104 = require("./routes/UserProfileData/Training4");
 const placementData = require("./routes/UserProfileData/PlacementData");
 const adminControl = require("./routes/adminControlRoutes/adminControl");
 const test = require("./routes/test.js");
+const certificate=require('./routes/getCertificate.js')
 
 app.use("/api/userprofiles", userProfileRoutes);
 app.use("/api/tr101", tr101);
@@ -40,6 +41,7 @@ app.use("/api/validate", validateRoute);
 app.use("/api/password", passwordResetRoute);
 app.use("/api/admin", adminControl);
 app.use("/api/test", test);
+app.use("/api/certificate", certificate);
 // Start the server
 const port = process.env.PORT;
 app.listen(port, () => {

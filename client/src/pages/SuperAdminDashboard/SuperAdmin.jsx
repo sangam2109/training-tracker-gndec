@@ -1,11 +1,12 @@
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Edit, School, ViewList } from "@mui/icons-material";
+import { Edit, School, ViewList,Download } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { Grid, Button, Paper, Typography } from "@mui/material";
+import { Grid, Button, Paper, Typography, CircularProgress } from "@mui/material";
 import { styled } from "@mui/system";
 import { useState , useEffect } from "react";
 import { decodeUserRole } from "../../utils/AdminFunctions";
+import { handleExportFullData } from "../../utils/ExportAllData";
 
 const API_URL =
     import.meta.env.VITE_ENV === "production"
@@ -38,6 +39,7 @@ const CardContainer = styled(Paper)({
 
 const SuperAdminForm = () => {
     const [role, setRole] = useState("")
+    const[loading,setLoading]=useState(false)
     
     const navigate = useNavigate();
     const navigateToTrainingNames = () => navigate("/superadmin/trainingNames");
@@ -87,6 +89,17 @@ const SuperAdminForm = () => {
                             <ViewList fontSize="large" />
                             <Typography variant="h6" sx={{ mt: 2 }}>
                                 View Student Data
+                            </Typography>
+                        </CardButton>
+                    </CardContainer>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                    <CardContainer>
+                        <CardButton variant="contained" onClick={()=>handleExportFullData(setLoading)}>
+                            {loading ?<CircularProgress color="inherit"/> : <Download fontSize="large" />}
+                            
+                            <Typography variant="h6" sx={{ mt: 2 }}>
+                                Download All Data As Excel
                             </Typography>
                         </CardButton>
                     </CardContainer>

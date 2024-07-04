@@ -36,15 +36,14 @@ const ProtectedRoute = ({ component: Component, path, ...rest }) => {
                 if (path === '/superadmin/studentData'){
                     return <StudentData />
                 }
+                if (path === "/superadmin/placementStats") {
+                    return <PlacementStats />;
+                } 
             }
             // Check if the user is authenticated and has the required role
             if (userRole === "superadmin") {
-                if (path === "/superadmin/placementStats") {
-                    return <PlacementStats />;
-                } else if (path === "/superadmin/trainingNames") {
+               if (path === "/superadmin/trainingNames") {
                     return <TrainingNames />;
-                } else if (path === "/admin/editProfile") {
-                    return <EditProfile />;
                 } 
             
                 // Redirect superadmin to home if trying to access admin or superadmin route

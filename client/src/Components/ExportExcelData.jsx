@@ -1,9 +1,12 @@
 import React from 'react';
 import { Button, Box } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { base64toBlob } from '../utils/base64topdf';
 import { saveAs } from 'file-saver';
 import ExcelJS from 'exceljs';
+const API_URL =
+    import.meta.env.VITE_ENV === "production"
+        ? import.meta.env.VITE_PROD_BASE_URL
+        : import.meta.env.VITE_DEV_BASE_URL;
 
 const ExportExcelComponent = ({ data, selectedTraining }) => {
     const handleExportData = async () => {
@@ -43,6 +46,7 @@ const ExportExcelComponent = ({ data, selectedTraining }) => {
                     { header: 'Appointment Number', key: 'AppointmentNumber' },
                     { header: 'Package', key: 'Package' },
                     { header: 'Appointment Date', key: 'AppointmentDate' },
+                    { header: 'Appointment Letter', key: 'AppointmentLetter' },
                     { header: 'Designation', key: 'Designation' },
                     { header: 'Gate Admit Card/ ScoreCard', key: 'GateAdmitCard' },
                     { header: 'Higher Study Status', key: 'HigherStudyStatus' },
@@ -51,74 +55,85 @@ const ExportExcelComponent = ({ data, selectedTraining }) => {
                 );
             }
         }
-            sheet.columns = columns;
+        sheet.columns = columns;
+        const hyperlinkStyle = {
+            font: { color: { argb: '0000FF' }, underline: true },
+            alignment: { vertical: 'middle', horizontal: 'left' }
+        };
         // Populate data rows
-            data.forEach(row => {
-                const rowData = {
-                    Name: row.userInfo.Name,
-                    CollegeEmail: row.email,
-                    UniversityRollNumber: row.userInfo.urn,
-                    CollegeRollNumber: row.crn,
-                    Gender: row.userInfo.gender,
-                    MentorName: row.userInfo.mentor,
-                    Batch: row.userInfo.batch,
-                    Section: row.userInfo.section,
-                    MotherName: row.userInfo.mother,
-                    FatherName: row.userInfo.father,
-                    ContactNumber: row.userInfo.contact,
-                    AdmissionType: row.userInfo.admissionType,
-                    PersonalEmail: row.userInfo.personalMail
-                };
+        data.forEach(row => {
+            const rowData = {
+                Name: row.userInfo.Name,
+                CollegeEmail: row.email,
+                UniversityRollNumber: row.userInfo.urn,
+                CollegeRollNumber: row.crn,
+                Gender: row.userInfo.gender,
+                MentorName: row.userInfo.mentor,
+                Batch: row.userInfo.batch,
+                Section: row.userInfo.section,
+                MotherName: row.userInfo.mother,
+                FatherName: row.userInfo.father,
+                ContactNumber: row.userInfo.contact,
+                AdmissionType: row.userInfo.admissionType,
+                PersonalEmail: row.userInfo.personalMail
+            };
 
-                // Add training-specific data based on selectedTraining
-                if (selectedTraining && row[selectedTraining]) {
-                    const trainingData = row[selectedTraining];
-                    if (selectedTraining !== "placementData") {
-                        rowData['TrainingType'] = trainingData.type;
-                        rowData['OrganizationName'] = trainingData.organization;
-                        rowData['ProjectName'] = trainingData.projectName;
-                        rowData['TechnologyUsed'] = trainingData.technology.join(', ');
+            // Add training-specific data based on selectedTraining
+            if (selectedTraining && row[selectedTraining]) {
+             
+                const trainingData = row[selectedTraining];
+                if (selectedTraining !== "placementData") {
+                    rowData['TrainingType'] = trainingData.type;
+                    rowData['OrganizationName'] = trainingData.organization;
+                    rowData['ProjectName'] = trainingData.projectName;
+                    rowData['TechnologyUsed'] = trainingData.technology.join(', ');
 
-                        if (trainingData.certificate) {
-                            const certificateBlob = base64toBlob(trainingData.certificate);
-                            const certificateUrl = URL.createObjectURL(certificateBlob);
-                            rowData['TrainingCertificate'] = {
-                                text: 'View Certificate',
-                                hyperlink: certificateUrl,
-                                tooltip: 'Click to view certificate'
-                            };
-                        }
-                    } else {
-                        rowData['PlacedStatus'] = trainingData.isPlaced;
-                        rowData['Company'] = trainingData.company;
-                        rowData['PlacementType'] = trainingData.placementType;
-                        rowData['AppointmentNumber'] = trainingData.appointmentNo;
-                        rowData['Package'] = trainingData.package;
-                        rowData['AppointmentDate'] = trainingData.appointmentDate;
-                        rowData['Designation'] = trainingData.designation;
+                    if (trainingData.certificate) {
+                        const certificateURL = `${API_URL}certificate/${selectedTraining}/${row._id}`;
+                        rowData['TrainingCertificate'] = { text: 'View Certificate', hyperlink: certificateURL };
+                    }
 
-                        if (trainingData.appointmentLetter) {
-                            const appointmentLetterBlob = base64toBlob(trainingData.appointmentLetter);
-                            const certificateUrl = URL.createObjectURL(appointmentLetterBlob);
-                            rowData['GateAdmitCard'] = {
-                                text: 'View Certificate',
-                                hyperlink: certificateUrl,
-                                tooltip: 'Click to view certificate'
-                            };
-                        }
-                        rowData['HigherStudyStatus'] = trainingData.highStudy;
-                        rowData['HigherStudyPlace'] = trainingData.highStudyplace;
-                        rowData['GateAppearedStatus'] = trainingData.gateStatus;
+                } else {
+                    rowData['PlacedStatus'] = trainingData.isPlaced;
+                    rowData['Company'] = trainingData.company;
+                    rowData['PlacementType'] = trainingData.placementType;
+                    rowData['AppointmentNumber'] = trainingData.appointmentNo;
+                    rowData['Package'] = trainingData.package;
+                    rowData['AppointmentDate'] = trainingData.appointmentDate;
+                    rowData['Designation'] = trainingData.designation;
+
+                    if (trainingData.appointmentLetter) {
+                        const certificateURL = `${API_URL}certificate/appointmentLetter/${row._id}`;
+                        rowData['AppointmentLetter'] = { text: 'View Certificate', hyperlink: certificateURL };
+                       
+                    }
+                    rowData['HigherStudyStatus'] = trainingData.highStudy;
+                    rowData['HigherStudyPlace'] = trainingData.highStudyplace;
+                    rowData['GateAppearedStatus'] = trainingData.gateStatus;
+                    if (trainingData.gateCertificate) {
+                        const certificateURL = `${API_URL}certificate/gateCertificate/${row._id}`;
+                        rowData['GateAdmitCard'] = { text: 'View Certificate', hyperlink: certificateURL };
+
                     }
                 }
+            }
 
-                sheet.addRow(rowData);
+            sheet.addRow(rowData);
         });
-
+        sheet.eachRow({ includeEmpty: false }, function (row) {
+            row.eachCell({ includeEmpty: false }, function (cell) {
+                if (cell.value && cell.value.hyperlink) {
+                    cell.style = hyperlinkStyle;
+                }
+            });
+        });
+        sheet.columns.forEach(column => {
+            column.width = 20;
+        });
         // Generate Excel file and download
         const buffer = await workbook.xlsx.writeBuffer();
-        const excelBlob = new Blob([s2ab(wbout)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      
+        const excelBlob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
         saveAs(excelBlob, 'training_data.xlsx');
     };
 

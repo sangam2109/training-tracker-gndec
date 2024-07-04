@@ -45,7 +45,7 @@ export const fetchUsers = async (selectedBatch, selectedTraining) => {
         });
         const filteredUsers = response.data.data
 
-        return { users: filteredUsers };
+        return filteredUsers ;
     } catch (error) {
         console.error("Error fetching users:", error);
         throw new Error("Error fetching users");
@@ -91,7 +91,7 @@ export const changeLock = async (
 };
 
 export const getTrainingOptions = (adminType, trainingNames) => {
-    const options = [{ value: "", label: "All" }];
+    const options = [{ value: "", label: "None" }];
 
     const trainingNumber = trainingNames[0]["Training_No"];
 
@@ -112,8 +112,9 @@ export const getTrainingOptions = (adminType, trainingNames) => {
     return options;
 };
 
-export const viewCertificate = (row, selectedTraining) => {
-    if (selectedTraining === "placementData") {
+export const viewCertificate = (row, selectedTraining,certificateType) => {
+    console.log(selectedTraining)
+    if (selectedTraining === "placementData" && certificateType==="appointmentLetter") {
         if (
             row.original.placementData &&
             row.original.placementData.appointmentLetter
@@ -122,6 +123,18 @@ export const viewCertificate = (row, selectedTraining) => {
         } else {
             console.error(
                 "Appointment Letter not found for this user in placement data.",
+            );
+        }
+    } 
+    else if (selectedTraining === "placementData" && certificateType === "gateCertificate") {
+        if (
+            row.original.placementData &&
+            row.original.placementData.gateCertificate
+        ) {
+            openBase64NewTab(row.original.placementData.gateCertificate);
+        } else {
+            console.error(
+                "Gate Certificate not found for this user in placement data.",
             );
         }
     } else if (
@@ -161,5 +174,25 @@ export const decodeUserRole = (token) => {
     } catch (error) {
         console.error("Error decoding JWT token:", error);
         return null;
+    }
+};
+
+
+
+export const getAllData = async () => {
+    try {
+        const token = localStorage.getItem("authtoken");
+        const response = await axios.get(`${API_URL}users/getallusers`, {
+            headers: {
+                "auth-token": token,
+            },
+        });
+        
+        const users = response.data.data
+
+        return users ;
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        throw new Error("Error fetching users");
     }
 };

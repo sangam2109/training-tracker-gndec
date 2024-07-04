@@ -95,9 +95,11 @@ const EditProfile = () => {
       const data = response.data.data;
       const userInfoData = response.data.data.userInfo
       if (data) {
+
         const datePickerBatch = convertBatchToDate(userInfoData.batch);
+
         setFormData({ ...data });
-        setuserInfo({ ...userInfoData, batch: datePickerBatch });
+        setuserInfo({ ...userInfoData });
 
         setAdmissionYear(datePickerBatch);
         setFetchError(false); 
@@ -171,13 +173,10 @@ const EditProfile = () => {
     }
   };
 
-  // Function to handle edit button click
-
-  // Function to handle submit button click
+ 
   const handleSubmit = async () => {
     try {
-      // Validate form data
-      console.log(formData)
+    
       const formDataErrors = Object.keys(formData).reduce((acc, key) => {
         const error = validateField(key, formData[key]);
         return error ? { ...acc, [key]: error } : acc;
@@ -311,9 +310,9 @@ const EditProfile = () => {
     }));
   };
   const handleBatchChange = (newDate) => {
-    // (newDate);
     setIsChanged(true);
     if (newDate) {
+      setAdmissionYear(newDate)
       const year = newDate.$y;
 
       setuserInfo({ ...userInfo, batch: `${year}-${year + 4}` });
@@ -630,7 +629,6 @@ const EditProfile = () => {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     label="Batch Start Year"
-
                     views={['year']}
                     renderInput={(params) => <TextField {...params} helperText="Enter starting year only" />}
                     onChange={handleBatchChange}
