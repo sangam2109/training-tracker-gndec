@@ -21,7 +21,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const API_URL = import.meta.env.VITE_ENV === 'production' ? import.meta.env.VITE_PROD_BASE_URL : import.meta.env.VITE_DEV_BASE_URL
 
-function Login() {
+function ForgotPassword() {
   const [credentials, setCredentials] = useState({ email: '', otp: '', newPassword: '' });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -72,7 +72,7 @@ function Login() {
       if (json.success) {
         toast.success('Password reset successful');
         setLoading(false);
-        // Optionally, redirect the user to the login page or another route
+        // Optionally, redirect the user to the ForgotPassword page or another route
       } else {
         toast.error(json.message);
         setLoading(false);
@@ -175,7 +175,7 @@ function Login() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="/login" variant="body2" style={{ color: '#0015ff' }}>
+              <Link href="/ForgotPassword" variant="body2" style={{ color: '#0015ff' }}>
                 Remembered your password? Log in
               </Link>
             </Grid>
@@ -186,4 +186,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgotPassword;

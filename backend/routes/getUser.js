@@ -5,6 +5,8 @@ const fetchuser = require('../middleware/fetchUser');
 const isAdmin = require('../middleware/isAdmin');
 const logEntry = require('../models/logs')
 const getUserCrn = require('../utils/getAdminDetails')
+const isSuperAdmin = require('../middleware/isSuperAdmin');
+
 router.get('/getuser/:crn', fetchuser, async (req, res) => {
   try {
     const crn = req.params.crn;
@@ -20,7 +22,7 @@ router.get('/getuser/:crn', fetchuser, async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error occurred' });
   }
 });
-router.get('/getallusers', fetchuser, isAdmin, async (req, res) => {
+router.get('/getallusers', fetchuser, isSuperAdmin, async (req, res) => {
   try {
     // Fetch all users
     const users = await SignUp.find({ role: 'user' }).select('-password -tr101.certificate -tr102.certificate -tr103.certificate -tr104.certificate -placementData.appointmentLetter -placementData.gateCertificate');

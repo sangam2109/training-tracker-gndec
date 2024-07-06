@@ -196,3 +196,20 @@ export const getAllData = async () => {
         throw new Error("Error fetching users");
     }
 };
+export const getAllLogs = async () => {
+    try {
+        const token = localStorage.getItem("authtoken");
+        const response = await axios.get(`${API_URL}logs/getalllogs`, {
+            headers: {
+                "auth-token": token,
+            },
+        });
+
+        const logs = response.data.data
+
+        return logs;
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        throw new Error("Error fetching users");
+    }
+};

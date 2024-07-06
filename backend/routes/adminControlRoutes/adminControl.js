@@ -2,12 +2,12 @@ const express = require("express");
 const adminControl = require("../../models/adminControl");
 const router = express.Router();
 const fetchuser = require("../../middleware/fetchUser");
-const isAdmin = require("../../middleware/isAdmin");
+const isSuperAdmin = require("../../middleware/isSuperAdmin");
 const { SignUp } = require("../../models/UserInfo");
 const logEntry = require('../../models/logs')
 const getUserCrn = require('../../utils/getAdminDetails')
 
-router.post("/trainingNames", fetchuser, isAdmin, async (req, res) => {
+router.post("/trainingNames", fetchuser, isSuperAdmin, async (req, res) => {
     try {
         const {
             Training_No,
@@ -75,7 +75,7 @@ router.get("/trainingNames", async (req, res) => {
     }
 });
 
-router.get("/getBatches", fetchuser, isAdmin, async (req, res) => {
+router.get("/getBatches", fetchuser, isSuperAdmin, async (req, res) => {
     try {
         // Fetch all users
         const users = await SignUp.find({ role: "user" }).select(
