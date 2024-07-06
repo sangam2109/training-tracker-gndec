@@ -3,7 +3,8 @@ const router = express.Router();
 const SignUp = require('../models/UserInfo').SignUp;
 const fetchuser = require('../middleware/fetchUser');
 const isAdmin = require('../middleware/isAdmin');
-
+const logEntry = require('../models/logs')
+const getUserCrn = require('../utils/getAdminDetails')
 router.get('/getuser/:crn', fetchuser, async (req, res) => {
   try {
     const crn = req.params.crn;
@@ -22,7 +23,7 @@ router.get('/getuser/:crn', fetchuser, async (req, res) => {
 router.get('/getallusers', fetchuser, isAdmin, async (req, res) => {
   try {
     // Fetch all users
-    const users = await SignUp.find({ role: 'user' }).select('-password');
+    const users = await SignUp.find({ role: 'user' }).select('-password -tr101.certificate -tr102.certificate -tr103.certificate -tr104.certificate -placementData.appointmentLetter -placementData.gateCertificate');
   
     // Return the list of users
     return res.status(200).json({ success: true, data: users });
@@ -65,6 +66,13 @@ router.put('/updateUser/:crn', fetchuser, isAdmin, async (req, res) => {
     }
     // (updatedUser)
     // User updated successfully
+    const token = req.header('auth-token')
+    const adminCrn = getUserCrn(token)
+    const newLogEntry = new logEntry({
+      user: adminCrn,
+      logMessage: `Update userDetails of ${crn}`
+    });
+    newLogEntry.save()
     return res.status(200).json({ success: true, data: updatedUser, message: "Data Updated Successfully" });
   } catch (error) {
     console.error('Error updating user:', error);

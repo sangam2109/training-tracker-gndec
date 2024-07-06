@@ -42,7 +42,6 @@ import {
   viewCertificate,
   getTrainingOptions,
   fetchBatches,
-  getAllData,
 } from "../../utils/AdminFunctions";
 import { TextField } from "@mui/material";
 import PlacementModal from "../../Components/PlacementModal";
@@ -653,11 +652,13 @@ const SuperAdminForm = () => {
                     selectedTraining={selectedTraining}
                     refresh={refresh}
                     onRefresh={handleRefresh}
+                    batch={selectedBatch}
                   />
                   <UnVerifyAllComponent
                     selectedTraining={selectedTraining}
                     refresh={refresh}
                     onRefresh={handleRefresh}
+                      batch={selectedBatch}
                   />
                 </div>
               )}

@@ -8,6 +8,8 @@ const generateOTP = require('./generateotp');
 const isAdmin = require('../../middleware/isAdmin');
 router.use(express.json());
 const storedOTPs = {};
+const logEntry = require('../../models/logs')
+const getUserCrn = require('../../utils/getAdminDetails')
 
 function cleanUpExpiredOTPs() {
   const now = Date.now();
@@ -92,7 +94,7 @@ router.post('/resetpassword', body('password', 'password should have a minimum l
     return res.status(500).json({ success: false, message: "Internal server error occurred" });
   }
 });
-router.post('/updatepassword',isAdmin,
+router.post('/updatepassword', isAdmin,
   body('crn').custom(value => {
     // Validate CRN format (assuming it's a 7-digit number or starts with 'Tr' followed by 3 digits)
     if (!/^\d{7}$|^Tr\d{3}$/.test(value)) {
@@ -108,7 +110,14 @@ router.post('/updatepassword',isAdmin,
         return res.status(400).json({ success: false, errors: errors.array() });
       }
 
-      const { crn, password } = req.body;
+      const { crn, password, adminCrn } = req.body;
+
+      // Admin CRN authorization check
+      if (["Tr101", "Tr102", "Tr103", "Tr104"].includes(adminCrn)) {
+        if (!/^\d{7}$/.test(crn)) {
+          return res.status(403).json({ success: false, message: "Not authorized" });
+        }
+      }
 
       // Find user by CRN
       const user = await signUp.findOne({ crn });
@@ -122,6 +131,12 @@ router.post('/updatepassword',isAdmin,
 
       // Update user's password
       user.password = hashedPassword;
+     
+      const newLogEntry = new logEntry({
+        user: adminCrn,
+        logMessage: `Updated Password of ${crn}`
+      });
+      newLogEntry.save()
       await user.save();
 
       return res.status(200).json({ success: true, message: "Password updated successfully" });

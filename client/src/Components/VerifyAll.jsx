@@ -17,7 +17,7 @@ const API_URL =
         ? import.meta.env.VITE_PROD_BASE_URL
         : import.meta.env.VITE_DEV_BASE_URL;
 
-const VerifyAllComponent = ({ selectedTraining, refresh, onRefresh }) => {
+const VerifyAllComponent = ({ selectedTraining, refresh, onRefresh,batch }) => {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const handleVerifyAll = async () => {
@@ -44,7 +44,7 @@ const VerifyAllComponent = ({ selectedTraining, refresh, onRefresh }) => {
             // Send a POST request to the backend API endpoint
             const response = await axios.post(
                 url,
-                {},
+                { batch: batch },
                 {
                     headers: {
                         "auth-token": token,

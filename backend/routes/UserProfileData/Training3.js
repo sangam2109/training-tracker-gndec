@@ -4,6 +4,8 @@ const SignUpdata = require('../../models/UserInfo').SignUp;
 const router = express.Router();
 const fetchuser = require('../../middleware/fetchUser');
 const isAdmin = require('../../middleware/isAdmin');
+const logEntry = require('../../models/logs')
+const getUserCrn = require('../../utils/getAdminDetails')
 
 // Route to create a new user profile
 router.post('/', fetchuser, async (req, res) => {
@@ -51,7 +53,13 @@ router.post('/updatelock', fetchuser, isAdmin, async (req, res) => {
             return res.status(404).json({ success: false, message: 'User data not found' });
         }
 
-
+        const token = req.header('auth-token')
+        const adminCrn = getUserCrn(token)
+        const newLogEntry = new logEntry({
+            user: adminCrn,
+            logMessage: `Verified Status for ${crn} is updated to ${lock} in tr103`
+        });
+        newLogEntry.save()
         // Respond with the updated user data
         res.status(200).json({ success: true });
     } catch (error) {
@@ -77,7 +85,9 @@ router.get('/:crn', fetchuser, async (req, res) => {
 router.post('/verifyall', fetchuser, isAdmin, async (req, res) => {
     try {
         // Get all users with the role "user"
-        const usersToUpdate = await SignUpdata.find({ role: 'user' });
+        const { batch } = req.body
+
+        const usersToUpdate = await SignUpdata.find({ role: 'user', 'userInfo.batch': batch });
 
         if (!usersToUpdate) {
             return res.status(404).json({ message: 'No users found' });
@@ -96,7 +106,13 @@ router.post('/verifyall', fetchuser, isAdmin, async (req, res) => {
                 throw err; // Propagate error to stop execution
             }
         }));
-
+        const token = req.header('auth-token')
+        const adminCrn = getUserCrn(token)
+        const newLogEntry = new logEntry({
+            user: adminCrn,
+            logMessage: `Verified Status for all Students of ${batch} is updated to true`
+        });
+        newLogEntry.save()
         // Respond with the updated user data
         res.status(200).json({ success: true });
     } catch (error) {
@@ -107,7 +123,9 @@ router.post('/verifyall', fetchuser, isAdmin, async (req, res) => {
 router.post('/unverifyall', fetchuser, isAdmin, async (req, res) => {
     try {
         // Get all users with the role "user"
-        const usersToUpdate = await SignUpdata.find({ role: 'user' });
+        const { batch } = req.body
+
+        const usersToUpdate = await SignUpdata.find({ role: 'user', 'userInfo.batch': batch });
 
         if (!usersToUpdate) {
             return res.status(404).json({ message: 'No users found' });
@@ -126,7 +144,13 @@ router.post('/unverifyall', fetchuser, isAdmin, async (req, res) => {
                 throw err; // Propagate error to stop execution
             }
         }));
-
+        const token = req.header('auth-token')
+        const adminCrn = getUserCrn(token)
+        const newLogEntry = new logEntry({
+            user: adminCrn,
+            logMessage: `Verified Status for all Students of ${batch} is updated to false`
+        });
+        newLogEntry.save()
         // Respond with the updated user data
         res.status(200).json({ success: true });
     } catch (error) {

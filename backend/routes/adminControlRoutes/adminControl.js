@@ -4,6 +4,8 @@ const router = express.Router();
 const fetchuser = require("../../middleware/fetchUser");
 const isAdmin = require("../../middleware/isAdmin");
 const { SignUp } = require("../../models/UserInfo");
+const logEntry = require('../../models/logs')
+const getUserCrn = require('../../utils/getAdminDetails')
 
 router.post("/trainingNames", fetchuser, isAdmin, async (req, res) => {
     try {
@@ -39,6 +41,13 @@ router.post("/trainingNames", fetchuser, isAdmin, async (req, res) => {
         if (!updatedDocument) {
             return res.status(404).json({ success: false, message: "Document not found or not updated" });
         }
+        const token = req.header('auth-token')
+        const adminCrn = getUserCrn(token)
+        const newLogEntry = new logEntry({
+            user: adminCrn,
+            logMessage: `Changed Training number or names`
+        });
+        newLogEntry.save()
 
         res.status(200).json({ success: true, data: updatedDocument });
     } catch (error) {
