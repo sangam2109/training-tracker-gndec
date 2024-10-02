@@ -45,7 +45,6 @@ router.put('/updateUser/:crn', fetchuser, isAdmin, async (req, res) => {
         $set: {
           email: updatedFormData.email,
           crn: updatedFormData.crn,
-          isVerified: updatedFormData.isVerified,
           'userInfo.mother': updatedFormData.userInfo.mother,
           'userInfo.Name': updatedFormData.userInfo.Name,
           'userInfo.contact': updatedFormData.userInfo.contact,
@@ -81,6 +80,40 @@ router.put('/updateUser/:crn', fetchuser, isAdmin, async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error occurred' });
   }
 });
+
+router.put('/updateVerification/:crn', fetchuser, isAdmin, async (req, res) => {
+  const { crn } = req.params;
+  try {
+    // Find the user by CRN
+    const user = await SignUp.findOne({ crn: crn });
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User for this CRN does not exist' });
+    }
+
+    // Check if the user is already verified
+    
+    if (user.isVerified) {
+      return res.status(200).json({ success: true, message: 'User is already verified' });
+    }
+
+    // If not verified, update the verification status
+    const updatedUser = await SignUp.findOneAndUpdate(
+      { crn: crn }, // Filter condition: find user by CRN
+      { $set: { isVerified: true } }, // Set the isVerified field to true
+      { new: true } // Return the updated user data
+    );
+
+    return res.status(200).json({ success: true, message: "Student Verified Successfully" });
+
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ success: false, message: 'Internal server error occurred' });
+  }
+});
+
+
 router.get('/getUsersByBatch', fetchuser, isAdmin, async (req, res) => {
   try {
     const { batch, trainingType } = req.query;

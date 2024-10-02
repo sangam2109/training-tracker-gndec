@@ -305,9 +305,8 @@ const SuperAdminForm = () => {
         );
       }
       // Add the "Verified" and "Mark Verification" columns at the end
-      if(selectedTraining!=="all"){
+      if (selectedTraining !== "all" && selectedTraining !=="placementData"){
 
-      
       customColumns.push(
         {
           accessorKey: `${selectedTraining}.lock`,

@@ -22,6 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { validateField, errorMessages } from "../../utils/ErrorFunctions";
 import { convertBatchToDate } from "../../utils/DateConvertToFrontend";
 import { decodeAuthToken } from "../../utils/AdminFunctions";
+import VerifyStudent from "../../Components/AdminComponent/VerifyStudent";
 // API_URL should point to your backend API endpoint
 const API_URL =
   import.meta.env.VITE_ENV === "production"
@@ -33,6 +34,7 @@ const EditProfile = () => {
   const [showModal, setShowModal] = useState(false); // Controls modal visibility
   const [formData, setFormData] = useState({}); // Stores original fetched data
   const [userInfo, setuserInfo] = useState({});
+  const [token,setToken]=useState(null)
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false); // Indicates loading state
   const [fetchError, setFetchError] = useState(false); // Indicates if there's an error fetching data
@@ -86,9 +88,11 @@ const EditProfile = () => {
     await Data();
     setShowModal(true);
   };
+  
+  
   const Data = async () => {
     try {
-      const token = localStorage.getItem("authtoken");
+      
       // Make GET request to fetch data for the given CRN
       const response = await axios.get(`${API_URL}users/getuser/${crn}`, {
         headers: { "auth-token": token },
@@ -121,8 +125,6 @@ const EditProfile = () => {
   };
   const hanldeChangePassword = async () => {
     try {
-     
-      
       const passwordError = validateField('password', passwordState.password
       );
       const confirmPasswordError = validateField('confirmPassword', passwordState.confirmPassword, passwordState);
@@ -138,9 +140,8 @@ const EditProfile = () => {
       setFetchError(false);
       setIsEditing(false);
       setIsChanged(false);
-      const token = localStorage.getItem("authtoken");
-      const AdminId = decodeAuthToken(token)
-      setAdminCrn(AdminId)
+      
+      
       // Make PUT request to update data with editedData
       const response = await axios.post(`${API_URL}password/updatepassword`, {
         crn: crn,
@@ -149,7 +150,6 @@ const EditProfile = () => {
       }, {
         headers: { "Content-Type": "application/json", "auth-token": token }
       });
-
    
       if (response.data.success) {
         setLoading(false);
@@ -190,16 +190,22 @@ const EditProfile = () => {
         const error = validateField(key, formData[key]);
         return error ? { ...acc, [key]: error } : acc;
       }, {});
-    console.log(userInfo)
+      // if user is not verified
+      let allErrors={}
+      if(formData.isVerified){
+        const userInfoErrors = Object.keys(userInfo).reduce((acc, key) => {
+          const error = validateField(key, userInfo[key]);
+          return error ? { ...acc, [key]: error } : acc;
+        }, {});
+        // Combine both sets of errors
+         allErrors = { ...formDataErrors, ...userInfoErrors };
+      }
+      else{
+         allErrors = { ...formDataErrors };
+      }
       // Validate userInfo
-      const userInfoErrors = Object.keys(userInfo).reduce((acc, key) => {
-        const error = validateField(key, userInfo[key]);
-        return error ? { ...acc, [key]: error } : acc;
-      }, {});
-      // Combine both sets of errors
-      const allErrors = { ...formDataErrors, ...userInfoErrors };
-      // console.log(allErrors)
-      // Check if there are any validation errors
+      
+    
       if (Object.keys(allErrors).length > 0) {
         let showError = true; // Flag to track if an error has been shown
         Object.values(allErrors).forEach(errorMessage => {
@@ -216,17 +222,23 @@ const EditProfile = () => {
       setFetchError(false);
       setIsEditing(false);
       setIsChanged(false);
-      const updatedFormData = {
-        ...formData,
-        userInfo: {
-          ...formData.userInfo, // Preserve existing userInfo properties
-          ...userInfo, // Update userInfo with new values from state
-        },
-      };
-
-
-      const token = localStorage.getItem("authtoken");
-      // Make PUT request to update data with editedData
+      let updatedFormData={}
+      if (formData.isVerified) {
+         updatedFormData = {
+          ...formData,
+          userInfo: {
+            ...formData.userInfo, // Preserve existing userInfo properties
+            ...userInfo, // Update userInfo with new values from state
+          },
+        };
+      }
+      else{
+        updatedFormData = {
+          ...formData
+        }
+      }
+       
+      
       const response = await axios.put(
         `${API_URL}users/updateUser/${crn}`,
         { updatedFormData },
@@ -263,7 +275,7 @@ const EditProfile = () => {
       setLoading(true);
       setFetchError(false);
       setIsChanged(false);
-      const token = localStorage.getItem("authtoken");
+      
 
       const response = await axios.delete(`${API_URL}auth/deleteUser`, {
         headers: {
@@ -342,6 +354,14 @@ const EditProfile = () => {
       [name]: validateField(name, value),
     }));
   };
+  useEffect(
+    () => {
+      const token=localStorage.getItem("authtoken");
+      setToken(token)
+      const AdminId = decodeAuthToken(token)
+      setAdminCrn(AdminId)
+    }
+  ,[])
 
   return (
     <Container style={{ marginTop: "100px" }}>
@@ -390,6 +410,7 @@ const EditProfile = () => {
           >
             <Typography>Change Password</Typography>
           </Button>
+         <VerifyStudent crn={crn} token={token}/>
 
         </Grid>
       </Grid>
@@ -520,25 +541,7 @@ const EditProfile = () => {
                   disabled={!isEditing}
                   InputLabelProps={{ shrink: true }}
                 />
-                <TextField
-                  select
-                  label="Verification Status"
-                  variant="outlined"
-                  fullWidth
-                  name="isVerified"
-                  value={formData.isVerified}
-                  onChange={handleChangeformData}
-                  sx={{
-                    mb: 2,
-                    "& .MuiSelect-select": { textAlign: "left" }, // Aligns the selected value to the left
-                  }}
-                  disabled={!isEditing}
-                  InputLabelProps={{ shrink: true }}
-                >
-                  <MenuItem value={true}>true</MenuItem>
-                  <MenuItem value={false}>false</MenuItem>
-
-                </TextField>
+                
                 <TextField
                   label="University Roll Number"
                   variant="outlined"

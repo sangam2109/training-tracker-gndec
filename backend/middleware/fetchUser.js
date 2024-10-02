@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const JWT_Token=process.env.JWT_TOKEN;
 const fetchuser=(req,res,next)=>{
     const token=req.header('auth-token')
+
     if(!token){
         res.status(400).json("Invalid or Null Token ! Enter correct Token.")
     }

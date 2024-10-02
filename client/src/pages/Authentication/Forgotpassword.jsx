@@ -18,6 +18,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Alert } from '@mui/material';
 
 const API_URL = import.meta.env.VITE_ENV === 'production' ? import.meta.env.VITE_PROD_BASE_URL : import.meta.env.VITE_DEV_BASE_URL
 
@@ -94,6 +95,12 @@ function ForgotPassword() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <ToastContainer />
+      {showOtpField &&
+        <Alert severity="info" sx={{ mt: 2 }}>
+
+          It takes 2-3 minutes to receive OTP on GNDEC mail. Please be patient.
+        </Alert>
+      }
       <Box
         sx={{
           display: 'flex',

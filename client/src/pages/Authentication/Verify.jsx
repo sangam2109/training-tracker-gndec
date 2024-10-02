@@ -7,7 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; 
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
@@ -15,6 +15,7 @@ import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress'; // Import CircularProgress
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
+import { Alert } from '@mui/material';
 const API_URL = import.meta.env.VITE_ENV === 'production' ? import.meta.env.VITE_PROD_BASE_URL : import.meta.env.VITE_DEV_BASE_URL
 
 
@@ -102,6 +103,11 @@ function Verify() {
     <Container component="main" maxWidth="xs" sx={{marginTop:2, marginBottom:10}}>
       <CssBaseline />
       <ToastContainer />
+      {showOTPField && 
+        <Alert severity="info">
+          It takes 2-3 minutes to receive OTP on GNDEC mail. Please be patient .
+        </Alert>
+      }
       <Box
         sx={{
           display: 'flex',

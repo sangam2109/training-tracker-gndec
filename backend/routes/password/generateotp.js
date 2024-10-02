@@ -24,7 +24,7 @@ const sendOTP = (email, validate) => {
     <p>GNDEC Ludhiana</p>` : 
     `<p>Hello ${frontName}! </p>
     <p>We received a request to reset your password for your Training Data Portal account. Use the OTP provided below to proceed with the reset:</p>
-    <p><b> Reset OTP: ${otp} </b></p>
+    <p><b> Reset Password: ${otp} </b></p>
     <p>If you didn't request a password reset, please ignore this email. Your account is safe, and no action is required.</p>
     <p>For any assistance, contact [Support Email/Phone]. We're here to help you!</p>
     <p>Best regards,</p>

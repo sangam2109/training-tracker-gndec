@@ -56,10 +56,10 @@ export function handleFormErrors(formData, isHighstudy) {
   return formErrors;
 }
 
-export function handleFileErrors(appointmentFiledata) {
+export function handleFileErrors(appointmentFiledata,optionalCertificate) {
   const fileErrors = {};
 
-  if (!isEmptyObject(appointmentFiledata)) {
+  if (!isEmptyObject(appointmentFiledata) && !optionalCertificate) {
     const sizestring = appointmentFiledata.size
     const sizeValue = parseInt(sizestring.replace(/\D/g, ''), 10);
     if (appointmentFiledata.type !== "application/pdf") {

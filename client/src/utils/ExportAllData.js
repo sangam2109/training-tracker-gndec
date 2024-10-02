@@ -122,32 +122,32 @@ const API_URL =
 
 
             };
-            if (row.tr101.certificate) {
+            if (row.tr101.organization) {
                 const certificateURL = `${API_URL}certificate/tr101/${row._id}`; // Replace with actual URL
                 rowData['TrainingCertificate1'] = { text: 'View Certificate', hyperlink: certificateURL };
                 
             }
-            if (row.tr102.certificate) {
+            if (row.tr102.organization) {
                 const certificateURL = `${API_URL}certificate/tr102/${row._id}`; // Replace with actual URL
                 rowData['TrainingCertificate1'] = { text: 'View Certificate', hyperlink: certificateURL };
 
             }
-            if (row.tr103.certificate) {
+            if (row.tr103.organization) {
                 const certificateURL = `${API_URL}certificate/tr103/${row._id}`; // Replace with actual URL
                 rowData['TrainingCertificate1'] = { text: 'View Certificate', hyperlink: certificateURL };
 
             }
-            if (row.tr104.certificate) {
+            if (row.tr104.organization) {
                 const certificateURL = `${API_URL}certificate/tr104/${row._id}`; // Replace with actual URL
                 rowData['TrainingCertificate1'] = { text: 'View Certificate', hyperlink: certificateURL };
 
             }
-            if (row.placementData.appointmentLetter) {
+            if (row.placementData.isPlaced) {
                 const certificateURL = `${API_URL}certificate/appointmentLetter/${row._id}`; // Replace with actual URL
                 rowData['AppointmentLetter'] = { text: 'View Certificate', hyperlink: certificateURL };
 
             }
-            if (row.placementData.gateCertificate) {
+            if (row.placementData.gateStatus) {
                 const certificateURL = `${API_URL}certificate/gateCertificate/${row._id}`; // Replace with actual URL
                 rowData['GateAdmitCard'] = { text: 'View Certificate', hyperlink: certificateURL };
 

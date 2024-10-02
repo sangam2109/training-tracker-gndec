@@ -111,7 +111,7 @@ router.post('/updatepassword', isAdmin,
       }
 
       const { crn, password, adminCrn } = req.body;
-
+console.log(req.body)
       // Admin CRN authorization check
       if (["Tr101", "Tr102", "Tr103", "Tr104"].includes(adminCrn)) {
         if (!/^\d{7}$/.test(crn)) {
