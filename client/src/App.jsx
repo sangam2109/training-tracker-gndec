@@ -17,6 +17,7 @@ import Footer from "./Components/Footer";
 import EditProfile from "./pages/EditProfile/EditProfile";
 import StudentData from "./pages/StudentData/StudentData";
 import Logs from "./pages/Logs/Logs";
+import MentorNames from "./pages/MentorNamesController/MentorNames"
 
 class App extends Component {
   render() {
@@ -57,6 +58,7 @@ class App extends Component {
             <Route path="/superadmin" element={<ProtectedRoute path="/superadmin" component={SuperAdminForm} />} />
 
             <Route path="/superadmin/placementStats" element={<ProtectedRoute path="/superadmin/placementStats" component={PlacementStats} />} />
+            <Route path="/superadmin/mentors" element={<ProtectedRoute path="/superadmin/mentors" component={MentorNames} />} />
            
             //not mentioned paths re routed to 
             <Route path="*" element={<Navigate to="/" />} />

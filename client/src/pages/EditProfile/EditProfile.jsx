@@ -23,6 +23,7 @@ import { validateField, errorMessages } from "../../utils/ErrorFunctions";
 import { convertBatchToDate } from "../../utils/DateConvertToFrontend";
 import { decodeAuthToken } from "../../utils/AdminFunctions";
 import VerifyStudent from "../../Components/AdminComponent/VerifyStudent";
+import { getMentors } from '../../utils/MentorData';
 // API_URL should point to your backend API endpoint
 const API_URL =
   import.meta.env.VITE_ENV === "production"
@@ -46,6 +47,7 @@ const EditProfile = () => {
   const [showModal3, setShowModal3] = useState(false);
   const [admissionYear, setAdmissionYear] = useState(null);
   const [adminCrn,setAdminCrn]=useState(null)
+  const [MENTORS, setMentors] = useState([])
 
   const [passwordState, setPasswordState] = useState({
     password: "",
@@ -360,6 +362,14 @@ const EditProfile = () => {
       setToken(token)
       const AdminId = decodeAuthToken(token)
       setAdminCrn(AdminId)
+      const fetchMentors = async () => {
+        const token = localStorage.getItem('authtoken');
+        const mentorList = await getMentors(token);
+        console.log(mentorList)// Get mentors from the backend API
+        setMentors(mentorList);
+      };
+
+      fetchMentors();
     }
   ,[])
 
@@ -665,19 +675,25 @@ const EditProfile = () => {
                     Computer Science & Engineering
                   </MenuItem>
                 </TextField>
-                <TextField
-                  label="Mentor's Name"
-                  variant="outlined"
-                  sx={{ mb: 2 }}
-                  fullWidth
-                  required
-                  name="mentor"
-                  placeholder="Your Mentor Name"
-                  value={userInfo?.mentor}
-                  onChange={handleChangeuserInfo}
-                  disabled={!isEditing}
-                  InputLabelProps={{ shrink: true }}
-                />
+                  <TextField
+                    select
+                    label="Mentor's Name"
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    fullWidth
+                    required
+                    name="mentor"
+                    value={userInfo?.mentor}
+                    onChange={handleChangeuserInfo}
+                    disabled={!isEditing}
+                    InputLabelProps={{ shrink: true }}
+                  >
+                    {MENTORS.map((teacher, index) => (
+                      <MenuItem key={index} value={teacher}>
+                        {teacher}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 <TextField
                   select
                   label="Gender"

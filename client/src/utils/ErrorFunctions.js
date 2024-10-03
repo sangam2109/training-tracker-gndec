@@ -98,6 +98,7 @@ export const errorMessages = {
   mother: "Mother's name is required",
   father: "Father's name is required",
   personalMail: "Invalid personal email format",
+  batch:"Batch is required",
   contact: "Invalid contact number",
   section: "Invalid section",
   branch: "Invalid branch",
@@ -129,6 +130,8 @@ export const validateField = (fieldName, value, formData) => {
       return value.trim() !== "" ? "" : errorMessages.mother;
     case "father":
       return value.trim() !== "" ? "" : errorMessages.father;
+    case "batch":
+      return value.trim() !== "" ? "" : errorMessages.batch;
     case "personalMail":
       return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value)
         ? ""

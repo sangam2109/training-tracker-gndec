@@ -46,6 +46,7 @@ const SuperAdminForm = () => {
     const navigateToEditProfile = () => navigate("/admin/editProfile");
     const navigateToStudentData = () => navigate("/superadmin/studentData");
     const navigateToLogs = () => navigate("/superadmin/logs");
+    const navigateToMentors = () => navigate("/superadmin/mentors");
     useEffect(() => {
         const token = localStorage.getItem('authtoken');
         const decodedRole = decodeUserRole(token)
@@ -118,6 +119,17 @@ const SuperAdminForm = () => {
                                 </CardButton>
                             </CardContainer>
                         </Grid>
+                    <Grid item xs={12} sm={6} md={4}>
+                        <CardContainer>
+                            <CardButton variant="contained" onClick={navigateToMentors}>
+                                <Description fontSize="large" />
+
+                                <Typography variant="h6" sx={{ mt: 2 }}>
+                                    Mentors Data
+                                </Typography>
+                            </CardButton>
+                        </CardContainer>
+                    </Grid>
                     </>
                 }
             </Grid>

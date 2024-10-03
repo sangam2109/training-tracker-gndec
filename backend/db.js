@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const adminControl = require("./models/adminControl");
 const { SignUp } = require("./models/UserInfo");
 require("dotenv").config();
+const { initializeMentors } = require("./utils/IntilializeMentors");
 
 const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 
@@ -23,6 +24,7 @@ const db = async () => {
         if (usersCount === 0) {
             await initializeUsers();
         }
+        await initializeMentors();
     } catch (error) {
         console.log("Some error occured", error);
     }
