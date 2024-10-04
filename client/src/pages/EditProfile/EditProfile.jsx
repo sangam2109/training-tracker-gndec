@@ -13,7 +13,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import MenuItem from "@mui/material/MenuItem";
-import { CircularProgress, Typography, Alert, AlertTitle } from "@mui/material";
+import { CircularProgress, Typography, Alert, AlertTitle,Autocomplete } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -675,25 +675,27 @@ const EditProfile = () => {
                     Computer Science & Engineering
                   </MenuItem>
                 </TextField>
-                  <TextField
-                    select
-                    label="Mentor's Name"
-                    variant="outlined"
+                  <Autocomplete
                     sx={{ mb: 2 }}
-                    fullWidth
-                    required
-                    name="mentor"
-                    value={userInfo?.mentor}
-                    onChange={handleChangeuserInfo}
+                    options={MENTORS}
+                    getOptionLabel={(option) => option || ''} 
+                    value={userInfo?.mentor || ''} 
+                    onChange={(event, newValue) =>
+                      handleChangeuserInfo({ target: { name: 'mentor', value: newValue || '' } }) 
+                    }
                     disabled={!isEditing}
-                    InputLabelProps={{ shrink: true }}
-                  >
-                    {MENTORS.map((teacher, index) => (
-                      <MenuItem key={index} value={teacher}>
-                        {teacher}
-                      </MenuItem>
-                    ))}
-                  </TextField>
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Mentor's Name"
+                        variant="outlined"
+                        fullWidth
+                        required
+                        InputLabelProps={{ shrink: true }}
+                      />
+                    )}
+                  />
+
                 <TextField
                   select
                   label="Gender"

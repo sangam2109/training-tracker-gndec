@@ -14,7 +14,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { jwtDecode } from "jwt-decode";
-import { Alert, AlertTitle, Grid, LinearProgress, CircularProgress } from '@mui/material';
+import { Alert, AlertTitle, Grid, LinearProgress, CircularProgress, Autocomplete } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
 import { convertBatchToDate } from '../utils/DateConvertToFrontend';
@@ -348,29 +348,28 @@ export default function Form() {
                 <MenuItem value="CSE">Computer Science & Engineering</MenuItem>
               </TextField>
              
-              <TextField
-                select
-                label="Mentor's Name"
-                variant="outlined"
-                fullWidth
-                required
-                name="mentor"
-                value={formData.mentor}
-                onChange={(e) => setMentor(e.target.value)}
+              <Autocomplete
+                options={MENTORS}
+                getOptionLabel={(option) => option || ''} // Handle null or undefined options
+                value={formData.mentor || null} // Ensure the value supports null
+                onChange={(event, newValue) => setMentor(newValue || '')} // Handle null or empty selections
                 disabled={isSubmitting}
-                error={!!errors.mentor}
-                helperText={errors.mentor}
-                sx={{
-                  mb: 2,
-                  '& .MuiSelect-select': { textAlign: 'left' } // Aligns the selected value to the left
-                }}
-              >
-                {MENTORS.map((teacher, index) => (
-                  <MenuItem key={index} value={teacher}>
-                    {teacher}
-                  </MenuItem>
-                ))}
-              </TextField>
+                isOptionEqualToValue={(option, value) => option === value || value === ''} // Ensure correct comparison with null
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Mentor's Name"
+                    variant="outlined"
+                    fullWidth
+                    required
+                    error={!!errors.mentor}
+                    helperText={errors.mentor}
+                    disabled={isSubmitting}
+                  />
+                )}
+                sx={{ mb: 2 }}
+              />
+
               <TextField
                 select
                 label="Gender"
