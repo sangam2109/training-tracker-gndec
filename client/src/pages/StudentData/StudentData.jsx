@@ -183,7 +183,7 @@ const SuperAdminForm = () => {
           {
             accessorKey: `${selectedTraining}.technology`,
             header: "Technology",
-            Cell: ({ row }) => row.original[selectedTraining]?.technology.join(" , "),
+            Cell: ({ row }) => row.original[selectedTraining]?.technology?.join(" , "),
           },
           {
             accessorKey: `${selectedTraining}.organization`,
