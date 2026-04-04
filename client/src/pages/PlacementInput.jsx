@@ -1,209 +1,216 @@
-import React, { useState, useEffect } from 'react';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import TextField from '@mui/material/TextField';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
-import MenuItem from '@mui/material/MenuItem';
-import FileBase from 'react-file-base64';
-import Grid from '@mui/material/Grid';
-import { openBase64NewTab } from '../utils/base64topdf';
-import EditIcon from '@mui/icons-material/Edit';
-import { convertBackendDateToPickerFormat } from '../utils/DateConvertToFrontend';
-import { handleFileErrors, handleFormErrors } from '../utils/ErrorFunctions';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import React, { useState, useEffect } from "react";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import TextField from "@mui/material/TextField";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import MenuItem from "@mui/material/MenuItem";
+import FileBase from "react-file-base64";
+import Grid from "@mui/material/Grid";
+import { openBase64NewTab } from "../utils/base64topdf";
+import EditIcon from "@mui/icons-material/Edit";
+import { convertBackendDateToPickerFormat } from "../utils/DateConvertToFrontend";
+import { handleFileErrors, handleFormErrors } from "../utils/ErrorFunctions";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LinearProgress, CircularProgress } from '@mui/material';
-import { decodeAuthToken } from '../utils/AdminFunctions';
-const API_URL = import.meta.env.VITE_ENV === 'production' ? import.meta.env.VITE_PROD_BASE_URL : import.meta.env.VITE_DEV_BASE_URL
+import { LinearProgress, CircularProgress } from "@mui/material";
+import { decodeAuthToken } from "../utils/AdminFunctions";
+const API_URL =
+    import.meta.env.VITE_ENV === "production"
+        ? import.meta.env.VITE_PROD_BASE_URL
+        : import.meta.env.VITE_DEV_BASE_URL;
 export default function PlacementForm() {
     const [formData, setFormData] = useState({
-        company: '',
-        placementType: '',
+        company: "",
+        placementType: "",
         highStudy: null,
-        appointmentNo: '',
+        appointmentNo: "",
         appointmentLetter: null,
-        package: '',
-        designation: '',
+        package: "",
+        designation: "",
         gateStatus: null,
-        gateCertificate: '',
-        appointmentDate: '',
+        gateCertificate: "",
+        appointmentDate: "",
         isPlaced: null,
-        highStudyplace: '',
-        lock:false
+        highStudyplace: "",
+        lock: false,
     });
     const [isPlaced, setIsPlaced] = useState(null);
-    const [AppointmentDate, SetAppointmentDate] = useState(null)
+    const [AppointmentDate, SetAppointmentDate] = useState(null);
     const [isHighstudy, setHighstudy] = useState(null);
     const [gateStatus, setgateStatus] = useState(null);
     const token = localStorage.getItem("authtoken");
     const crn = decodeAuthToken(token);
     const [errors, setErrors] = useState({});
-    const [Gatefiledata, setGateFiledata] = useState({})
-    const [Appointmentfiledata, setAppointmentFiledata] = useState({})
+    const [Gatefiledata, setGateFiledata] = useState({});
+    const [Appointmentfiledata, setAppointmentFiledata] = useState({});
     const [appointmentLetter, setAppointmentLetter] = useState(null);
     const [GateCertificate, setGateCertificate] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isEditing, setIsEditing] = useState(true);
     const [isLock, setIsLock] = useState(false);
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-    const fetchData = async () => {
-        try {
-            setLoading(true)
-            const token = localStorage.getItem('authtoken');
-            const url = `${API_URL}placement/${crn}`;
-            const response = await axios.get(url, {
-                headers: {
-                    "auth-token": token
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const token = localStorage.getItem("authtoken");
+                const url = `${API_URL}placement/${crn}`;
+                const response = await axios.get(url, {
+                    headers: {
+                        "auth-token": token,
+                    },
+                });
+                const userData = response.data.data;
+                setFormData(userData);
+
+                setIsPlaced(userData.isPlaced);
+                if (userData.isPlaced) {
+                    const formattedAppointmentDate = convertBackendDateToPickerFormat(
+                        userData.appointmentDate,
+                    );
+                    SetAppointmentDate(formattedAppointmentDate);
+                    setAppointmentLetter(userData.appointmentLetter);
                 }
-            });
-            const userData = response.data.data;
-            setFormData(userData)
+                setIsLock(userData.lock || false);
+                setHighstudy(userData.highStudy);
+                setgateStatus(userData.gateStatus);
+                if (userData.gateStatus) {
+                    setGateCertificate(userData.gateCertificate);
+                }
 
-            setIsPlaced(userData.isPlaced);
-            if(userData.isPlaced){
-                const formattedAppointmentDate = convertBackendDateToPickerFormat(userData.appointmentDate);
-                SetAppointmentDate(formattedAppointmentDate)
-                setAppointmentLetter(userData.appointmentLetter);
+                setIsEditing(false);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setLoading(false);
+            } finally {
+                setLoading(false);
             }
-            setIsLock(userData.lock || false);
-            setHighstudy(userData.highStudy);
-            setgateStatus(userData.gateStatus);
-            if(userData.gateStatus){
-                setGateCertificate(userData.gateCertificate);
-            }
-          
-            setIsEditing(false);
-        } 
-     catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false)
-    } finally {
-        setLoading(false)
-    }
-};
-    fetchData();
-}, []);
+        };
+        fetchData();
+    }, []);
     const handleDateChange = (newDate) => {
         // Extract year, month, and day from the selected date
-        SetAppointmentDate(newDate)
+        SetAppointmentDate(newDate);
         const year = newDate.$y;
         const month = newDate.$M + 1; // Months start from 0, so add 1
         const day = newDate.$D;
 
         // Format the date string
-        const formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        const formattedDate = `${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
 
         setFormData({ ...formData, appointmentDate: formattedDate });
     };
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
 
-const handleChange = (e) => {
-    const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
 
-    setFormData({ ...formData, [name]: value });
-
-    // Dynamic regex and validation check messages
-    let regex;
-    let errorMsg;
-    switch (name) {
-        case 'contact':
-            regex = /^\d{10}$/;
-            errorMsg = 'Contact must be 10 digits';
-            break;
-        case 'crn':
-            regex = /^\d{7}$/;
-            errorMsg = 'CRN must be a 7-digit number';
-            break;
-        default:
-            break;
-    }
-    if (regex && !regex.test(value)) {
-        setErrors({ ...errors, [name]: errorMsg });
-    } else {
-        setErrors({ ...errors, [name]: '' });
-    }
-};
-
-const handleSubmit = async (e) => {
-    setLoading(true)
-    e.preventDefault();
-    setErrors({});
-    try {
-        const formErrors = handleFormErrors(formData, isHighstudy);
-        if (Object.keys(formErrors).length > 0) {
-            setErrors(formErrors);
-            setLoading(false)
-            return;
+        // Dynamic regex and validation check messages
+        let regex;
+        let errorMsg;
+        switch (name) {
+            case "contact":
+                regex = /^\d{10}$/;
+                errorMsg = "Contact must be 10 digits";
+                break;
+            case "crn":
+                regex = /^\d{7}$/;
+                errorMsg = "CRN must be a 7-digit number";
+                break;
+            default:
+                break;
         }
-        if (formData.isPlaced) {
-            const fileErrors = handleFileErrors(Appointmentfiledata);
-            if (Object.keys(fileErrors).length > 0) {
-                // Display file-related errors
-                setErrors({ ...errors, ...fileErrors });
-                setLoading(false)
-                return;
-            }
-        }
-        if (formData.gateStatus===true) {
-            const fileErrors = handleFileErrors(Gatefiledata);
-            if (Object.keys(fileErrors).length > 0) {
-                // Display file-related errors
-                setErrors({ ...errors, ...fileErrors });
-                setLoading(false)
-                return;
-            }
-        }
-     
-        const token = localStorage.getItem('authtoken');
-        // Submit form data
-        const response = await axios.post(`${API_URL}placement`, {
-            formData: formData,
-            crn: crn,
-        },
-            {
-                headers: {
-                    "auth-token": token
-                }
-            });
-
-        if (response.data.success) {
-            toast.success('Placement details submitted successfully!');
-            setIsSubmitting(false);
-            setIsEditing(false);
-            setLoading(false)
-            setGateFiledata({})
-            setAppointmentFiledata({})
-         
+        if (regex && !regex.test(value)) {
+            setErrors({ ...errors, [name]: errorMsg });
         } else {
-            toast.error('Failed to submit placement details. Please try again later.');
-            setIsSubmitting(false);
-            setLoading(false)
-            setGateFiledata({})
-            setAppointmentFiledata({})
+            setErrors({ ...errors, [name]: "" });
         }
-    } catch (error) {
-        console.error('Error submitting data:', error);
-        toast.error('An error occurred while submitting the placement details.');
-        setIsSubmitting(false);
-        setLoading(false)
-        setGateFiledata({})
-        setAppointmentFiledata({})
-    }
-};
+    };
+
+    const handleSubmit = async (e) => {
+        setLoading(true);
+        e.preventDefault();
+        setErrors({});
+        try {
+            const formErrors = handleFormErrors(formData, isHighstudy);
+            if (Object.keys(formErrors).length > 0) {
+                setErrors(formErrors);
+                setLoading(false);
+                return;
+            }
+            if (formData.isPlaced) {
+                const fileErrors = handleFileErrors(Appointmentfiledata);
+                if (Object.keys(fileErrors).length > 0) {
+                    // Display file-related errors
+                    setErrors({ ...errors, ...fileErrors });
+                    setLoading(false);
+                    return;
+                }
+            }
+            if (formData.gateStatus === true) {
+                const fileErrors = handleFileErrors(Gatefiledata);
+                if (Object.keys(fileErrors).length > 0) {
+                    // Display file-related errors
+                    setErrors({ ...errors, ...fileErrors });
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            const token = localStorage.getItem("authtoken");
+            // Submit form data
+            const response = await axios.post(
+                `${API_URL}placement`,
+                {
+                    formData: formData,
+                    crn: crn,
+                },
+                {
+                    headers: {
+                        "auth-token": token,
+                    },
+                },
+            );
+
+            if (response.data.success) {
+                toast.success("Placement details submitted successfully!");
+                setIsSubmitting(false);
+                setIsEditing(false);
+                setLoading(false);
+                setGateFiledata({});
+                setAppointmentFiledata({});
+            } else {
+                toast.error(
+                    "Failed to submit placement details. Please try again later.",
+                );
+                setIsSubmitting(false);
+                setLoading(false);
+                setGateFiledata({});
+                setAppointmentFiledata({});
+            }
+        } catch (error) {
+            console.error("Error submitting data:", error);
+            toast.error("An error occurred while submitting the placement details.");
+            setIsSubmitting(false);
+            setLoading(false);
+            setGateFiledata({});
+            setAppointmentFiledata({});
+        }
+    };
     const handleAppointmentFileChange = (files) => {
-        setAppointmentFiledata(files)
+        setAppointmentFiledata(files);
         setFormData({ ...formData, appointmentLetter: files.base64 });
         setAppointmentLetter(files.base64);
     };
     const handleGateFileChange = (files) => {
-        setGateFiledata(files)
+        setGateFiledata(files);
         setFormData({ ...formData, gateCertificate: files.base64 });
         setGateCertificate(files.base64);
     };
@@ -220,30 +227,27 @@ const handleSubmit = async (e) => {
     };
     const handleIsPlacedChange = (e) => {
         const { name, value } = e.target;
-        setIsPlaced(value) 
+        setIsPlaced(value);
         setFormData({ ...formData, [name]: value });
     };
     const handleIsHighChange = (e) => {
-    
         const { name, value } = e.target;
         setHighstudy(value);
         setFormData({ ...formData, [name]: value });
     };
     const handleIsGateStatusChange = (e) => {
-    
         const { name, value } = e.target;
         setgateStatus(value);
         setFormData({ ...formData, [name]: value });
     };
 
-
-
     return (
         <>
             {loading && <LinearProgress />}
             <Container style={{ marginBottom: "100px" }}>
-
-                <Container style={{ paddingInline: 0, paddingBottom: 50, marginTop: '15px' }} >
+                <Container
+                    style={{ paddingInline: 0, paddingBottom: 50, marginTop: "15px" }}
+                >
                     {!isLock && (
                         <Button
                             onClick={handleEdit}
@@ -251,8 +255,8 @@ const handleSubmit = async (e) => {
                             variant="contained"
                             disabled={loading}
                             style={{
-                                position: 'relative',
-                                float: 'left',
+                                position: "relative",
+                                float: "left",
                             }}
                         >
                             <EditIcon />
@@ -267,25 +271,40 @@ const handleSubmit = async (e) => {
                             endIcon={<KeyboardArrowRightIcon />}
                             disabled={isSubmitting || loading}
                             style={{
-                                position: 'relative',
-                                float: 'right',
+                                position: "relative",
+                                float: "right",
                             }}
                         >
-                            {loading ? <CircularProgress size={24} color='inherit' /> : 'Submit'}
+                            {loading ? (
+                                <CircularProgress size={24} color="inherit" />
+                            ) : (
+                                "Submit"
+                            )}
                         </Button>
                     )}
-                    <div style={{
-                        display: 'flex', gap: '10px', position: 'relative',
-                        float: 'right',
-                    }}>
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "10px",
+                            position: "relative",
+                            float: "right",
+                        }}
+                    >
                         {!isEditing && appointmentLetter && (
-                            <Button onClick={() => handleViewCertificate(appointmentLetter)}
-                                variant="outlined" color="primary">
+                            <Button
+                                onClick={() => handleViewCertificate(appointmentLetter)}
+                                variant="outlined"
+                                color="primary"
+                            >
                                 View Appointment Letter
                             </Button>
                         )}
-                        {!isEditing && (gateStatus) && (
-                            <Button onClick={() => handleViewCertificate(GateCertificate)} variant="outlined" color="primary">
+                        {!isEditing && gateStatus && (
+                            <Button
+                                onClick={() => handleViewCertificate(GateCertificate)}
+                                variant="outlined"
+                                color="primary"
+                            >
                                 View Gate Admit Card
                             </Button>
                         )}
@@ -304,13 +323,11 @@ const handleSubmit = async (e) => {
                         onChange={handleIsPlacedChange}
                         sx={{ mb: 2 }}
                         disabled={!isEditing || isSubmitting}
-                        InputLabelProps={{ shrink: true }} 
+                        InputLabelProps={{ shrink: true }}
                     >
                         <MenuItem value={true}>Yes</MenuItem>
                         <MenuItem value={false}>No</MenuItem>
                     </TextField>
-
-
                 </Grid>
 
                 {isPlaced && (
@@ -345,7 +362,6 @@ const handleSubmit = async (e) => {
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
-
                                 <TextField
                                     label="Appointment Number"
                                     variant="outlined"
@@ -360,12 +376,16 @@ const handleSubmit = async (e) => {
                                     sx={{ mb: 2 }}
                                     disabled={!isEditing || isSubmitting}
                                 />
-                                <LocalizationProvider dateAdapter={AdapterDayjs} >
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
-
                                         label="Appointment Date"
-                                        views={['year', 'month', 'day']}
-                                        renderInput={(params) => <TextField {...params} helperText="Enter starting year only" />}
+                                        views={["year", "month", "day"]}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                helperText="Enter starting year only"
+                                            />
+                                        )}
                                         onChange={handleDateChange}
                                         value={AppointmentDate}
                                         disabled={!isEditing || isSubmitting}
@@ -378,7 +398,7 @@ const handleSubmit = async (e) => {
                             <TextField
                                 select
                                 label="Placement Type"
-                                placeholder='Select any one'
+                                placeholder="Select any one"
                                 variant="outlined"
                                 fullWidth
                                 required
@@ -394,13 +414,13 @@ const handleSubmit = async (e) => {
                             </TextField>
 
                             <TextField
-                                label="Package"
-                                placeholder='in LPA'
+                                label="Package (in LPA)"
+                                placeholder="in LPA"
                                 variant="outlined"
                                 fullWidth
                                 required
                                 name="package"
-                                style={{ marginTop: '10px' }}
+                                style={{ marginTop: "10px" }}
                                 value={formData.package}
                                 onChange={handleChange}
                                 error={!!errors.package}
@@ -408,34 +428,39 @@ const handleSubmit = async (e) => {
                                 sx={{ mb: 2 }}
                                 disabled={!isEditing || isSubmitting}
                             />
-
                         </Grid>
 
                         {isEditing && (
-                            <Grid item xs={12} md={6} marginBottom={2} container justifyContent="space-between" alignItems="center">
-
-                                <Typography variant="h6" gutterBottom textAlign="left" >
+                            <Grid
+                                item
+                                xs={12}
+                                md={6}
+                                marginBottom={2}
+                                container
+                                justifyContent="space-between"
+                                alignItems="center"
+                            >
+                                <Typography variant="h6" gutterBottom textAlign="left">
                                     Upload Appointment Letter <br />
-                                    <Typography style={{ fontSize: '14px' }}>(in PDF format only / size less than 500Kb)</Typography>
+                                    <Typography style={{ fontSize: "14px" }}>
+                                        (in PDF format only / size less than 500Kb)
+                                    </Typography>
                                 </Typography>
                                 <FileBase
                                     type="file"
                                     multiple={false}
-
                                     onDone={handleAppointmentFileChange}
-
                                     disabled={!isEditing || isSubmitting}
                                 />
-
-                            </Grid>)}
-
+                            </Grid>
+                        )}
                     </>
                 )}
                 <Grid item xs={12} md={6}>
                     <TextField
                         select
                         label="Will you pursue higher studies?"
-                        placeholder='Select any one'
+                        placeholder="Select any one"
                         variant="outlined"
                         fullWidth
                         required
@@ -444,13 +469,13 @@ const handleSubmit = async (e) => {
                         onChange={handleIsHighChange}
                         sx={{ mb: 2 }}
                         disabled={!isEditing || isSubmitting}
-                        InputLabelProps={{ shrink: true }} 
+                        InputLabelProps={{ shrink: true }}
                     >
                         <MenuItem value={true}>Yes</MenuItem>
                         <MenuItem value={false}>No</MenuItem>
                     </TextField>
                 </Grid>
-                {isHighstudy  && (
+                {isHighstudy && (
                     <Grid item xs={12} md={6}>
                         <TextField
                             select
@@ -463,7 +488,7 @@ const handleSubmit = async (e) => {
                             onChange={handleChange}
                             sx={{ mb: 2 }}
                             disabled={!isEditing || isSubmitting}
-                            InputLabelProps={{ shrink: true }} 
+                            InputLabelProps={{ shrink: true }}
                         >
                             <MenuItem value={""}>Select Any One</MenuItem>
                             <MenuItem value="India">India</MenuItem>
@@ -477,7 +502,7 @@ const handleSubmit = async (e) => {
                         select
                         label="Have you appeared in Gate Exam?"
                         variant="outlined"
-                        placeholder='Select any one'
+                        placeholder="Select any one"
                         fullWidth
                         required
                         name="gateStatus"
@@ -485,18 +510,31 @@ const handleSubmit = async (e) => {
                         onChange={handleIsGateStatusChange}
                         sx={{ mb: 2 }}
                         disabled={!isEditing || isSubmitting}
-                        InputLabelProps={{ shrink: true }} 
+                        InputLabelProps={{ shrink: true }}
                     >
                         <MenuItem value={true}>Yes</MenuItem>
                         <MenuItem value={false}>No</MenuItem>
                     </TextField>
                 </Grid>
                 {isEditing && gateStatus && (
-                    <Grid item xs={12} container justifyContent="space-between" alignItems="center">
-                        <Typography variant="h6" gutterBottom textAlign="left" marginTop={2}>
+                    <Grid
+                        item
+                        xs={12}
+                        container
+                        justifyContent="space-between"
+                        alignItems="center"
+                    >
+                        <Typography
+                            variant="h6"
+                            gutterBottom
+                            textAlign="left"
+                            marginTop={2}
+                        >
                             Upload Gate Admit Card / Scorecard
                             <br />
-                            <Typography style={{ fontSize: '14px' }}>(in PDF format only / size less than 500Kb)</Typography>
+                            <Typography style={{ fontSize: "14px" }}>
+                                (in PDF format only / size less than 500Kb)
+                            </Typography>
                         </Typography>
                         <FileBase
                             type="file"
@@ -505,7 +543,6 @@ const handleSubmit = async (e) => {
                             disabled={!isEditing || isSubmitting}
                         />
                     </Grid>
-
                 )}
 
                 <ToastContainer />
@@ -513,4 +550,3 @@ const handleSubmit = async (e) => {
         </>
     );
 }
-

@@ -1,0 +1,13 @@
+name: Deploy training tracker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: stop the server if running
+        run: docker compose down

@@ -20,15 +20,17 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { LinearProgress, CircularProgress } from '@mui/material';
 import { handleFileErrors } from '../utils/ErrorFunctions';
 
-const API_URL = import.meta.env.VITE_ENV === 'production' ? import.meta.env.VITE_PROD_BASE_URL : import.meta.env.VITE_DEV_BASE_URL
-
+const API_URL =
+  import.meta.env.VITE_ENV === "production"
+    ? import.meta.env.VITE_PROD_BASE_URL
+    : import.meta.env.VITE_DEV_BASE_URL;
 
 export default function Form() {
   const [formData, setFormData] = useState({
-    organization: '',
+    organization: "",
     technology: [],
-    projectName: '',
-    type: '',
+    projectName: "",
+    type: "",
     certificate: null,
     organizationType: ''
   });
@@ -56,8 +58,8 @@ export default function Form() {
         const crn = decodeAuthToken(token);
         const response = await axios.get(`${API_URL}tr${number}/${crn}`, {
           headers: {
-            "auth-token": token
-          }
+            "auth-token": token,
+          },
         });
         const userData = response.data.data;
 
@@ -74,25 +76,23 @@ export default function Form() {
           }
           setIsEditing(false);
           if (userData.lock) {
-            setIsLock(true)
+            setIsLock(true);
           } else {
-            setIsLock(false)
+            setIsLock(false);
           }
         } else {
-          console.error('Error: Fetched data is incomplete.');
+          console.error("Error: Fetched data is incomplete.");
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false)
+        console.error("Error fetching data:", error);
+        setLoading(false);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -121,7 +121,7 @@ export default function Form() {
   };
 
   const handleSubmit = async (e) => {
-    setLoading(true)
+    setLoading(true);
     e.preventDefault();
     try {
       const formErrors = {};
@@ -148,7 +148,6 @@ export default function Form() {
         toast.error(formErrors.type)
         setLoading(false)
         return;
-
       }
       if (optionalCertificate === false && !formData.certificate) {
         formErrors.certificate = 'Certificate is blank ';
@@ -174,36 +173,40 @@ export default function Form() {
       if (Object.keys(fileErrors).length > 0) {
         // Display file-related errors
         setErrors({ ...errors, ...fileErrors });
-        setLoading(false)
+        setLoading(false);
         return;
       }
       const token = localStorage.getItem("authtoken");
       const crn = decodeAuthToken(token);
-      const url = `${API_URL}tr${number}`
-      const response = await axios.post(url, { formData, crn: crn }, {
-        headers: {
-          "auth-token": token
-        }
-      });
+      const url = `${API_URL}tr${number}`;
+      const response = await axios.post(
+        url,
+        { formData, crn: crn },
+        {
+          headers: {
+            "auth-token": token,
+          },
+        },
+      );
 
       if (response.data.success) {
-        toast.success('Form submitted successfully!');
+        toast.success("Form submitted successfully!");
         setIsSubmitting(false);
         setIsEditing(false);
-        setLoading(false)
-        selectedFiledata({})
+        setLoading(false);
+        selectedFiledata({});
       } else {
-        toast.error('Failed to submit form. Please try again later.');
+        toast.error("Failed to submit form. Please try again later.");
         setIsSubmitting(false);
-        setLoading(false)
-        selectedFiledata({})
+        setLoading(false);
+        selectedFiledata({});
       }
     } catch (error) {
-      console.error('Error submitting data:', error);
-      toast.error('An error occurred while submitting the form.');
+      console.error("Error submitting data:", error);
+      toast.error("An error occurred while submitting the form.");
       setIsSubmitting(false);
-      setLoading(false)
-      selectedFiledata({})
+      setLoading(false);
+      selectedFiledata({});
     }
   };
   const noCertificateAvailable = () => {
@@ -213,8 +216,7 @@ export default function Form() {
   const handleViewCertificate = () => {
     if (certificate) {
       openBase64NewTab(certificate);
-    }
-    else {
+    } else {
       openBase64NewTab(formData.certificate);
     }
   };
@@ -223,7 +225,7 @@ export default function Form() {
   };
 
   const handleFileChange = (files) => {
-    selectedFiledata(files)
+    selectedFiledata(files);
     setFormData({ ...formData, certificate: files.base64 });
     setCertificate(files.base64);
 
@@ -392,7 +394,17 @@ export default function Form() {
               multiple={false}
               onDone={handleFileChange}
               disabled={!isEditing || isSubmitting}
+            <FileBase
+              type="file"
+              multiple={false}
+              onDone={handleFileChange}
+              disabled={!isEditing || isSubmitting}
               accept=".pdf"
+            />
+          </>
+        )}
+        <ToastContainer />
+      </Container>
             />
           </>
         )}

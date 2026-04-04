@@ -1,0 +1,12 @@
+﻿{
+  "repositoryName": "whogurdevil/training-tracker-gndec",
+  "pipelineDirectory": "training-tracker-gndec",
+  "workspaceDirectory": "training-tracker-gndec/training-tracker-gndec",
+  "repositories": {
+    "whogurdevil/training-tracker-gndec": {
+      "repositoryPath": "training-tracker-gndec/training-tracker-gndec",
+      "lastRunOn": "06/03/2024 23:03:39 +05:30"
+    }
+  },
+  "lastRunOn": "06/03/2024 23:03:39 +05:30"
+}
