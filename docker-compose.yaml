@@ -10,13 +10,13 @@ services:
       - "8443:8443"
     restart: always
     environment:
-    - DB_HOST=mongodb
-    - DB_USER=$MONGODB_USER
-    - DB_PASSWORD=$MONGODB_PASSWORD
-    - DB_NAME=$MONGODB_DATABASE
-    - DB_PORT=$MONGODB_DOCKER_PORT
+      - DB_HOST=mongodb
+      - DB_USER=$MONGODB_USER
+      - DB_PASSWORD=$MONGODB_PASSWORD
+      - DB_NAME=$MONGODB_DATABASE
+      - DB_PORT=$MONGODB_DOCKER_PORT
     depends_on:
-    - mongodb
+      - mongodb
 
   frontend:
     container_name: frontend
@@ -24,22 +24,22 @@ services:
       context: ./client
       dockerfile: Dockerfile
     ports:
-    - "3000:3000"
+      - "3000:3000"
     restart: always
 
   mongodb:
     image: mongo:latest
     container_name: mongodb_server
+    volumes:
+      - mongodb_data:/data/trainingcse
 
     env_file: ./.env
     environment:
-    - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
-    - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
+      - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
     ports:
-    - "27017:27017"
-
+      - "27017:27017"
 
 volumes:
   mongodb_data:
     driver: local
-

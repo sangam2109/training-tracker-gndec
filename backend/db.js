@@ -6,12 +6,10 @@ const { initializeMentors } = require("./utils/IntilializeMentors");
 
 const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 
-// const URI = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`
-const URI=process.env.DATABASE
+const URI = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`;
 
 const db = async () => {
     try {
-        console.log(URI);
         await mongoose.connect(URI);
         console.log("connected mongodb successfully");
 

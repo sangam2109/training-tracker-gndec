@@ -95,6 +95,7 @@ const SuperAdminForm = () => {
       try {
         setLoading(true);
 
+
         const usersData = await fetchUsers(selectedBatch, selectedTraining);
         if (usersData) {
 
@@ -116,7 +117,6 @@ const SuperAdminForm = () => {
       console.warn("Batch, training, or branch selection is missing.");
     }
   };
-
 
   const navigateToStats = (data) => {
     return navigate("/superadmin/placementStats", { state: { data } });
@@ -146,12 +146,14 @@ const SuperAdminForm = () => {
           {
             accessorKey: `${selectedTraining}.isPlaced`,
             header: "Placement Status",
-            Cell: ({ row }) => (row.original[selectedTraining]?.isPlaced ? "Yes" : "No"),
+            Cell: ({ row }) =>
+              row.original[selectedTraining]?.isPlaced ? "Yes" : "No",
           },
           {
             accessorKey: `${selectedTraining}.highStudy`,
             header: "Higher Study",
-            Cell: ({ row }) => (row.original[selectedTraining]?.highStudy ? "Yes" : "No"),
+            Cell: ({ row }) =>
+              row.original[selectedTraining]?.highStudy ? "Yes" : "No",
           },
           {
             accessorKey: `${selectedTraining}.gateStatus`,
@@ -175,7 +177,7 @@ const SuperAdminForm = () => {
                 style={{ cursor: "pointer" }}
               />
             ),
-          }
+          },
         );
       }
       if (selectedTraining !== "placementData" && selectedTraining!=="all") {
@@ -208,7 +210,7 @@ const SuperAdminForm = () => {
                 style={{ cursor: "pointer" }}
               />
             ),
-          }
+          },
         );
       }
       if(selectedTraining==="all"){
@@ -311,7 +313,8 @@ const SuperAdminForm = () => {
         {
           accessorKey: `${selectedTraining}.lock`,
           header: "Verified",
-          Cell: ({ row }) => (row.original[selectedTraining]?.lock ? "Yes" : "No"),
+          Cell: ({ row }) =>
+            row.original[selectedTraining]?.lock ? "Yes" : "No",
         },
         {
           accessorKey: "edit",
@@ -323,7 +326,7 @@ const SuperAdminForm = () => {
               row={row}
             />
           ),
-        }
+        },
       );
           }
     }
